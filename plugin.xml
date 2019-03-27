@@ -1,21 +1,3 @@
-Skip to content
- 
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@weglov Sign out
-3
-5 3 DavidBriglio/cordova-plugin-foreground-service
- Code  Issues 2  Pull requests 0  Projects 0  Wiki  Insights
-cordova-plugin-foreground-service/plugin.xml
-@DavidBriglio DavidBriglio Updated version number for npm
-deaa68a on Feb 4
-31 lines (30 sloc)  1.55 KB
-    
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-ws-foreground" version="1.0.0">
     <name>Cordova Soket.IO Foreground Service</name>
@@ -24,12 +6,12 @@ deaa68a on Feb 4
     <author>Viktor Shcheglov</author>
     <keywords>cordova,background,foreground,service,ws,socket</keywords>
     <js-module src="www/foreground.js" name="SocketService">
-        <clobbers target="cordova.plugins.WsForeground" />
+        <clobbers target="cordova.plugins.wsforeground" />
     </js-module>
 
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
-            <feature name="WsForeground">
+            <feature name="wsforeground">
                 <param name="android-package" value="com.wsforeground.plugin.SocketService" />
             </feature>
         </config-file>
