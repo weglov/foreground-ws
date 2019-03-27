@@ -1,12 +1,15 @@
 // JS interface
 var exec = require('cordova/exec');
 
-var ForegroundWs = {
-	serviceName: "ForegroundWs",
+var WsForeground = {
+	serviceName: "WsForeground",
 
-	start: function(success, error, token) {
-		exec(success, error, this.serviceName, "start", [token]);
+	start: function(success, error, args) {
+		exec(success, error, this.serviceName, "start", [args]);
+	},
+	stop: function(success, error, args) {
+		exec(success, error, this.serviceName, "stop", [args]);
 	},
 };
 
-module.exports = ForegroundWs;
+module.exports = WsForeground;

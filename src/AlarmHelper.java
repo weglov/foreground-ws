@@ -16,9 +16,7 @@ import com.wsforeground.plugin.BaseAlarmHelper;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
-/**
- * Created by FromTheSeventhSky on 29.03.2018.
- */
+
 public class AlarmHelper implements BaseAlarmHelper {
 
     private MediaPlayer player;

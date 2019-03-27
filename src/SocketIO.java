@@ -1,6 +1,5 @@
 package com.wsforeground.plugin;
 
-
 import com.google.gson.internal.LinkedTreeMap;
 
 import io.reactivex.subjects.PublishSubject;
