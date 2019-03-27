@@ -3,6 +3,7 @@ package com.wsforeground.plugin;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 import android.content.Intent;
+import com.wsforeground.plugin.IncomingOrdersService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,6 +19,8 @@ public class WsForeground extends CordovaPlugin {
 
         if (action.equals("start")) {
             String token = args.getString(0);
+            String wsUrl = args.getString(1);
+            Boolean isFastFood = args.getBoolean(2);
             this.start(token, callbackContext);
             return true;
         }
@@ -30,9 +33,11 @@ public class WsForeground extends CordovaPlugin {
         return false;
     }
 
-    private void start(String token, CallbackContext callbackContext) {
+    private void start(String token, String wsUrl, Boolean isFastFood, isCallbackContext callbackContext) {
       Intent serviceIntent = new Intent(cordova.getActivity(), IncomingOrdersService.class);
       serviceIntent.putExtra("token", token);
+      serviceIntent.putExtra("wsUrl", wsUrl);
+      serviceIntent.putExtra("isFastFood", isFastFood);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
           cordova.getActivity().startForegroundService(serviceIntent);
       } else {

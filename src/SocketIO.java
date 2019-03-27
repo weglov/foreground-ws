@@ -1,57 +1,28 @@
 package com.wsforeground.plugin;
 
-import com.google.gson.internal.LinkedTreeMap;
 
-import javax.inject.Inject;
+import com.google.gson.internal.LinkedTreeMap;
 
 import io.reactivex.subjects.PublishSubject;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import okhttp3.OkHttpClient;
-import ru.foodfox.vendor.BuildConfig;
 import ru.foodfox.vendor.rx.GenericEmitter;
-import ru.foodfox.vendor.utils.NetworkChecker;
-import ru.foodfox.vendor.utils.TextUtils;
 
-import static io.socket.client.Socket.EVENT_CONNECT;
-import static io.socket.client.Socket.EVENT_CONNECT_ERROR;
-import static io.socket.client.Socket.EVENT_DISCONNECT;
 import static io.socket.client.Socket.EVENT_PING;
 import static io.socket.client.Socket.EVENT_PONG;
-import static io.socket.client.Socket.EVENT_RECONNECT;
 import static io.socket.engineio.client.transports.WebSocket.NAME;
-import static ru.foodfox.vendor.params.Params.LogType.SOCKET_CONNECT;
-import static ru.foodfox.vendor.params.Params.LogType.SOCKET_NEW_ORDER;
-import static ru.foodfox.vendor.params.Params.LogType.SOCKET_ORDER_CHANGED;
-import static ru.foodfox.vendor.params.Params.LogType.SOCKET_ORDER_STATUS_CHANGED;
-import static ru.foodfox.vendor.params.Params.LogType.SOCKET_PONG;
-import static ru.foodfox.vendor.params.Params.LogType.SOCKET_RECONNECT;
-import static ru.foodfox.vendor.params.Params.LogType.SOCKET_RESTAURANT_TOGGLE;
-import static ru.foodfox.vendor.params.Params.MetricaEvent.ConnectionError.CONNECTION_PROBLEM;
-import static ru.foodfox.vendor.params.Params.MetricaEvent.ConnectionError.DEVICE_OFFLINE;
-import static ru.foodfox.vendor.params.Params.MetricaEvent.EventTitles.EVENT_NOTIFIER_CONNECTED;
-import static ru.foodfox.vendor.params.Params.MetricaEvent.EventTitles.EVENT_NOTIFIER_CONNECTED_ERROR;
-import static ru.foodfox.vendor.params.Params.MetricaEvent.EventTitles.EVENT_NOTIFIER_DISCONNECTED;
-import static ru.foodfox.vendor.params.Params.Socket.Events.EVENT_CHANGE_MENU_FAIL;
-import static ru.foodfox.vendor.params.Params.Socket.Events.EVENT_CHANGE_ORDER_ITEM_LIST;
-import static ru.foodfox.vendor.params.Params.Socket.Events.EVENT_CHANGE_ORDER_STATUS;
-import static ru.foodfox.vendor.params.Params.Socket.Events.EVENT_NEW_ORDER;
-import static ru.foodfox.vendor.params.Params.Socket.Events.EVENT_RESTAURANT_TOGGLE;
+
 import static ru.foodfox.vendor.service.SocketEvent.Event.CHANGED;
-import static ru.foodfox.vendor.service.SocketEvent.Event.CHANGE_MENU_FAIL;
-import static ru.foodfox.vendor.service.SocketEvent.Event.CONNECTED;
-import static ru.foodfox.vendor.service.SocketEvent.Event.CONNECTION_ERROR;
-import static ru.foodfox.vendor.service.SocketEvent.Event.DISCONNECTED;
 import static ru.foodfox.vendor.service.SocketEvent.Event.NEW;
-import static ru.foodfox.vendor.service.SocketEvent.Event.RESTAURANT_TOGGLE;
 import static ru.foodfox.vendor.service.SocketEvent.Event.STATUS_CHANGED;
 
-/**
- * Created by FromTheSeventhSky on 25.02.2018.
- */
-
 public class SocketIO implements SocketInterface {
+
+    String EVENT_CHANGE_ORDER_STATUS = "changeOrderStatus";
+    String EVENT_CHANGE_ORDER_ITEM_LIST = "changeOrderItemList";
+    String EVENT_NEW_ORDER = "newOrder";
 
     private Socket socket;
 
@@ -64,19 +35,6 @@ public class SocketIO implements SocketInterface {
     private String url;
     private String token;
 
-    /*private final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[]{};
-        }
-
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-    }};*/
-
-    @Inject
     public SocketIO(String url, String token, OkHttpClient client) {
         this.url = url;
         this.token = token;
@@ -99,9 +57,6 @@ public class SocketIO implements SocketInterface {
                 opts.reconnectionDelay = 2000;
                 opts.reconnectionDelayMax = 7000;
                 opts.query = "token=" + token + query;
-                /*SSLContext sslContext = SSLContext.getInstance("SSL");
-                sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-                //opts.sslContext = sslContext;*/
                 socket = IO.socket(url, opts);
 
                 socket.on(EVENT_PING, onPing);
@@ -191,11 +146,11 @@ public class SocketIO implements SocketInterface {
             if (data != null && data instanceof LinkedTreeMap) {
                 LinkedTreeMap map = (LinkedTreeMap) data;
                 String orderId = (String) map.get("orderId");
-                if (TextUtils.notEmpty(orderId)) {
+                if (orderId != null && !orderId.isEmpty()) {
                     event.id = orderId;
                 }
                 String orderStatus = (String) map.get("orderStatus");
-                if (TextUtils.notEmpty(orderStatus)) {
+                if (orderStatus != null && !orderStatus.isEmpty()) {
                     event.status = orderStatus;
                 }
             }

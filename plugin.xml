@@ -23,21 +23,28 @@ deaa68a on Feb 4
     <license>MIT</license>
     <author>Viktor Shcheglov</author>
     <keywords>cordova,background,foreground,service,ws,socket</keywords>
-    <js-module src="www/foreground.js" name="WsService">
+    <js-module src="www/foreground.js" name="SocketService">
         <clobbers target="cordova.plugins.WsForeground" />
     </js-module>
 
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="WsForeground">
-                <param name="android-package" value="com.wsforeground.plugin.WsService" />
+                <param name="android-package" value="com.wsforeground.plugin.SocketService" />
             </feature>
         </config-file>
+        <framework src="com.squareup.okhttp3:okhttp:3.10.0" />
+        <framework src="io.socket:socket.io-client:1.0.0" />
+        <framework src="io.reactivex.rxjava2:rxjava:2.1.12" />
+        <framework src="com.google.code.gson:gson:2.8.2" />
         <config-file parent="/*" target="AndroidManifest.xml" />
-        <source-file src="src/WsService.java" target-dir="src/com/wsforeground/plugin/WsService" />
-        <source-file src="src/AlarmHelper.java" target-dir="src/com/wsforeground/plugin/AlarmHelper" />
+        <source-file src="src/SocketService.java" target-dir="src/com/wsforeground/plugin/SocketService" />
         <source-file src="src/SocketIO.java" target-dir="src/com/wsforeground/plugin/SocketIO" />
+        <source-file src="src/SocketEvent.java" target-dir="src/com/wsforeground/plugin/SocketEvent" />
+        <source-file src="src/IncomingOrdersService.java" target-dir="src/com/wsforeground/plugin/IncomingOrdersService" />
+        <source-file src="src/GenericEmitter.java" target-dir="src/com/wsforeground/plugin/GenericEmitter" />
         <source-file src="src/BaseAlarmHelper.java" target-dir="src/com/wsforeground/plugin/BaseAlarmHelper" />
+        <source-file src="src/AlarmHelper.java" target-dir="src/com/wsforeground/plugin/AlarmHelper" />
         <resource-file src="raw/new_order.mp3" target="res/raw/new_order.mp3" />
     </platform>
 </plugin>
