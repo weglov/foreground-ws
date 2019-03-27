@@ -20,7 +20,13 @@
         <framework src="io.reactivex.rxjava2:rxjava:2.1.12" />
         <framework src="com.google.code.gson:gson:2.8.2" />
         <config-file parent="/*" target="AndroidManifest.xml" />
-        <source-file src="src/*" target-dir="src/com/wsforeground/plugin" />
+        <source-file src="src/SocketService.java" target-dir="src/com/wsforeground/plugin" />
+        <source-file src="src/SocketIO.java" target-dir="src/com/wsforeground/plugin" />
+        <source-file src="src/SocketEvent.java" target-dir="src/com/wsforeground/plugin" />
+        <source-file src="src/IncomingOrdersService.java" target-dir="src/com/wsforeground/plugin" />
+        <source-file src="src/GenericEmitter.java" target-dir="src/com/wsforeground/plugin" />
+        <source-file src="src/BaseAlarmHelper.java" target-dir="src/com/wsforeground/plugin" />
+        <source-file src="src/AlarmHelper.java" target-dir="src/com/wsforeground/plugin" />
         <resource-file src="raw/new_order.mp3" target="res/raw/new_order.mp3" />
     </platform>
 </plugin>
