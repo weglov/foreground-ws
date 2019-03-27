@@ -1,0 +1,43 @@
+Skip to content
+ 
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@weglov Sign out
+3
+5 3 DavidBriglio/cordova-plugin-foreground-service
+ Code  Issues 2  Pull requests 0  Projects 0  Wiki  Insights
+cordova-plugin-foreground-service/plugin.xml
+@DavidBriglio DavidBriglio Updated version number for npm
+deaa68a on Feb 4
+31 lines (30 sloc)  1.55 KB
+    
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-ws-foreground" version="1.0.0">
+    <name>Cordova Soket.IO Foreground Service</name>
+    <description>Foreground service with socket.io.</description>
+    <license>MIT</license>
+    <author>Viktor Shcheglov</author>
+    <keywords>cordova,background,foreground,service,ws,socket</keywords>
+    <js-module src="www/foreground.js" name="WsService">
+        <clobbers target="cordova.plugins.WsForeground" />
+    </js-module>
+
+    <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="WsForeground">
+                <param name="android-package" value="com.wsforeground.plugin.WsService" />
+            </feature>
+        </config-file>
+        <config-file parent="/*" target="AndroidManifest.xml" />
+        <source-file src="src/WsService.java" target-dir="src/com/wsforeground/plugin/WsService" />
+        <source-file src="src/AlarmHelper.java" target-dir="src/com/wsforeground/plugin/AlarmHelper" />
+        <source-file src="src/SocketIO.java" target-dir="src/com/wsforeground/plugin/SocketIO" />
+        <source-file src="src/BaseAlarmHelper.java" target-dir="src/com/wsforeground/plugin/BaseAlarmHelper" />
+        <resource-file src="raw/new_order.mp3" target="res/raw/new_order.mp3" />
+    </platform>
+</plugin>
