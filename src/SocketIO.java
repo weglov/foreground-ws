@@ -7,17 +7,16 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import okhttp3.OkHttpClient;
-import ru.foodfox.vendor.rx.GenericEmitter;
 
+import static com.wsforeground.plugin.SocketEvent.Event.CHANGED;
+import static com.wsforeground.plugin.SocketEvent.Event.NEW;
+import static com.wsforeground.plugin.SocketEvent.Event.STATUS_CHANGED;
 import static io.socket.client.Socket.EVENT_PING;
 import static io.socket.client.Socket.EVENT_PONG;
 import static io.socket.engineio.client.transports.WebSocket.NAME;
 
-import static ru.foodfox.vendor.service.SocketEvent.Event.CHANGED;
-import static ru.foodfox.vendor.service.SocketEvent.Event.NEW;
-import static ru.foodfox.vendor.service.SocketEvent.Event.STATUS_CHANGED;
 
-public class SocketIO implements SocketInterface {
+public class SocketIO{
 
     String EVENT_CHANGE_ORDER_STATUS = "changeOrderStatus";
     String EVENT_CHANGE_ORDER_ITEM_LIST = "changeOrderItemList";
@@ -40,7 +39,6 @@ public class SocketIO implements SocketInterface {
         this.client = client;
     }
 
-    @Override
     public void init(String query) {
 
         synchronized (semaphore) {
@@ -69,7 +67,6 @@ public class SocketIO implements SocketInterface {
         }
     }
 
-    @Override
     public void done() {
         synchronized (semaphore) {
             if (socket == null) {
@@ -157,7 +154,6 @@ public class SocketIO implements SocketInterface {
         }
     }
 
-    @Override
     public PublishSubject<SocketEvent> getUpdates() {
         return publisher;
     }

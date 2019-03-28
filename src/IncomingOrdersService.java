@@ -5,11 +5,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.content.res.Resources;
 import android.support.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -18,11 +18,8 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import okhttp3.OkHttpClient;
-import com.wsforeground.plugin.BuildConfig;
-import com.wsforeground.plugin.R;
-import com.wsforeground.plugin.BaseAlarmHelper;
-import com.wsforeground.plugin.MainActivity;
-import com.wsforeground.plugin.AlarmHelper;
+import ru.yandex.vendor.dev.BuildConfig;
+import ru.yandex.vendor.dev.MainActivity;
 
 
 public class IncomingOrdersService extends Service {
@@ -30,7 +27,7 @@ public class IncomingOrdersService extends Service {
     int FOREGROUND_NOTIFICATION_ID = 93872;
     String FOREGROUND_NOTIFICATION_CHANNEL = "Yandex.Vendor.Notification.Channel.Foreground";
 
-    SocketInterface socket;
+    SocketIO socket;
 
     BaseAlarmHelper alarmHelper;
 
@@ -42,7 +39,7 @@ public class IncomingOrdersService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        createForegroundNotification(getString(R.string.service_foreground_wait));
+        createForegroundNotification("Приложение работает в фоновом режиме", "Связь с сервисом установлена");
         alarmHelper = new AlarmHelper(getBaseContext());
 
         compositeDisposable = new CompositeDisposable();
@@ -50,10 +47,10 @@ public class IncomingOrdersService extends Service {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
 
-        if (wifiManager != null && pm != null) {
-            wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "YandexVendorWiFiLock");
-            powerLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YandexVendorPowerLock");
-        }
+//        if (wifiManager != null && pm != null) {
+//            wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "YandexVendorWiFiLock");
+//            powerLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YandexVendorPowerLock");
+//        }
 
     }
 
@@ -149,12 +146,20 @@ public class IncomingOrdersService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    private int getIconResId ()
+    {
+        Resources res  = getResources();
+        String pkgName = getPackageName();
+
+        int resId =  res.getIdentifier("monochrome", "drawable", pkgName);
+        return resId;
+    }
+
     protected Consumer<Disposable> disposer() {
         return d -> compositeDisposable.add(d);
     }
 
-
-    private void createForegroundNotification(String text) {
+    private void createForegroundNotification(String text, String title) {
         Intent contentIntent = new Intent(this, MainActivity.class);
         contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -169,12 +174,16 @@ public class IncomingOrdersService extends Service {
         } else {
             builder = new Notification.Builder(this);
         }
-        builder.setContentTitle(getString(R.string.notification_title))
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.foodfox_launcher))
-                .setSmallIcon(R.drawable.logo_monochrome)
+        builder.setContentTitle(title)
                 .setContentText(text)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setSmallIcon(getIconResId());
+        } else {
+            builder.setSmallIcon(android.R.drawable.btn_star);
+        }
         startForeground(FOREGROUND_NOTIFICATION_ID, builder.build());
     }
 

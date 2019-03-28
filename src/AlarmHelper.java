@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.wsforeground.plugin.R;
-import com.wsforeground.plugin.BaseAlarmHelper;
+import ru.yandex.vendor.dev.R;
+
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
@@ -47,8 +47,8 @@ public class AlarmHelper implements BaseAlarmHelper {
     public AlarmHelper(Context context) {
         try {
             newOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.new_order);
-            editedOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.edited_order);
-            cancelledOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.canceled_order);
+//            editedOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.edited_order);
+//            cancelledOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.canceled_order);
 
             ringingNewOrders = new HashSet<>();
             this.context = context;

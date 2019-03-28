@@ -3,6 +3,7 @@ package com.wsforeground.plugin;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 import android.content.Intent;
+import android.util.Log;
 import com.wsforeground.plugin.IncomingOrdersService;
 
 import org.json.JSONArray;
@@ -13,15 +14,16 @@ import android.content.Context;
 import android.os.Build;
 
 
-public class WsForeground extends CordovaPlugin {
+public class SocketService extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
         if (action.equals("start")) {
-            String token = args.getString(0);
-            String wsUrl = args.getString(1);
-            Boolean isFastFood = args.getBoolean(2);
-            this.start(token, callbackContext);
+            JSONObject settings = args.optJSONObject(0);
+            String token = settings.getString("token");
+            String wsUrl = settings.getString("url");
+            Boolean isFastFood = settings.getBoolean("isFastFood");
+            this.start(token, wsUrl, isFastFood, callbackContext);
             return true;
         }
 
@@ -33,7 +35,7 @@ public class WsForeground extends CordovaPlugin {
         return false;
     }
 
-    private void start(String token, String wsUrl, Boolean isFastFood, isCallbackContext callbackContext) {
+    private void start(String token, String wsUrl, Boolean isFastFood, CallbackContext callbackContext) {
       Intent serviceIntent = new Intent(cordova.getActivity(), IncomingOrdersService.class);
       serviceIntent.putExtra("token", token);
       serviceIntent.putExtra("wsUrl", wsUrl);

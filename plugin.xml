@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-ws-foreground" version="1.0.0">
-    <name>Cordova Soket.IO Foreground Service</name>
+    <name>SocketService</name>
     <description>Foreground service with socket.io.</description>
     <license>MIT</license>
     <author>Viktor Shcheglov</author>
     <keywords>cordova,background,foreground,service,ws,socket</keywords>
-    <js-module src="www/foreground.js" name="SocketService">
+    <js-module src="www/socketService.js" name="SocketService">
         <clobbers target="cordova.plugins.wsforeground" />
     </js-module>
 
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
-            <feature name="wsforeground">
+            <feature name="SocketService">
                 <param name="android-package" value="com.wsforeground.plugin.SocketService" />
             </feature>
         </config-file>
@@ -28,5 +28,12 @@
         <source-file src="src/BaseAlarmHelper.java" target-dir="src/com/wsforeground/plugin" />
         <source-file src="src/AlarmHelper.java" target-dir="src/com/wsforeground/plugin" />
         <resource-file src="raw/new_order.mp3" target="res/raw/new_order.mp3" />
+        <resource-file src="raw/monochrome.xml" target="res/drawable/monochrome.xml"/>
+        <uses-permission android:name="android.permission.VIBRATE" />
+        <service
+            android:name="com.wsforeground.plugin.IncomingOrdersService"
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="false" />
     </platform>
 </plugin>
