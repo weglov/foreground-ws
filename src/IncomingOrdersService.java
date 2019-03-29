@@ -1,6 +1,8 @@
 package com.wsforeground.plugin;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -10,7 +12,8 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.content.res.Resources;
-import android.support.annotation.Nullable;
+import android.util.Log;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -39,6 +42,7 @@ public class IncomingOrdersService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("message", "onCreate");
         createForegroundNotification("Приложение работает в фоновом режиме", "Связь с сервисом установлена");
         alarmHelper = new AlarmHelper(getBaseContext());
 
@@ -91,6 +95,7 @@ public class IncomingOrdersService extends Service {
         }
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String token = intent.getStringExtra("token");
@@ -123,20 +128,20 @@ public class IncomingOrdersService extends Service {
                     } else {
                         alarmHelper.newOrderNotification(socketEvent.id);
                     }
-                    /**
-                     * TODO
-                     */
+                    createNotification(socketEvent.id, "Новый заказ!", "new");
                     break;
                 case CHANGED:
+                    alarmHelper.stopNotification(socketEvent.id);
                     alarmHelper.editOrderNotification();
-                    /**
-                     * TODO
-                     */
-                    break;
+                    createNotification(socketEvent.id, "Заказ изменен", "изменен");
                 case STATUS_CHANGED:
-                    /**
-                     * TODO
-                     */
+                    switch (socketEvent.status) {
+                        case "refused":
+                            alarmHelper.stopNotification(socketEvent.id);
+                            alarmHelper.cancelOrderNotification();
+                            createNotification(socketEvent.id, "Заказ отменен", "отмена");
+                            break;
+                    }
                     break;
 
             }
@@ -187,7 +192,38 @@ public class IncomingOrdersService extends Service {
         startForeground(FOREGROUND_NOTIFICATION_ID, builder.build());
     }
 
-    @Nullable
+    private void createNotification(String orderId, String text, String title) {
+        NotificationManager manager = (NotificationManager)getBaseContext().getSystemService(NOTIFICATION_SERVICE);
+        Intent contentIntent = new Intent(this, ClickReceiver.class);
+        contentIntent.putExtra("orderId", orderId);
+        PendingIntent pendingIntent = PendingIntent.getService(
+                this,
+                1112,
+                contentIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+
+        Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder = new Notification.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL);
+        } else {
+            builder = new Notification.Builder(this);
+        }
+        builder.setContentTitle(title)
+                .setContentText(text)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setSmallIcon(getIconResId());
+        } else {
+            builder.setSmallIcon(android.R.drawable.btn_star);
+        }
+
+        manager.notify(orderId.hashCode(), builder.build());
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;

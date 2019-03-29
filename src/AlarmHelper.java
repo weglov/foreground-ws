@@ -1,6 +1,7 @@
 package com.wsforeground.plugin;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -10,8 +11,6 @@ import android.os.Vibrator;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
-import ru.yandex.vendor.dev.R;
 
 
 import static android.content.Context.VIBRATOR_SERVICE;
@@ -43,15 +42,23 @@ public class AlarmHelper implements BaseAlarmHelper {
     private long[] vibrationPatternNew = {250, 500, 250, 500};
     private long[] vibrationPatternEdit = {250, 750, 500, 250, 750, 250};
     private long[] vibrationPatternCancel = {250, 250, 250, 250, 750, 750, 250, 250};
+    private int getSoundId (String name)
+    {
+        Resources res  = context.getResources();
+        String pkgName = context.getPackageName();
+
+        int resId =  res.getIdentifier(name, "raw", pkgName);
+        return resId;
+    }
 
     public AlarmHelper(Context context) {
         try {
-            newOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.new_order);
-//            editedOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.edited_order);
-//            cancelledOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.canceled_order);
+            this.context = context;
+            newOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + getSoundId("new_order"));
+            editedOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + getSoundId("order_changed"));
+            cancelledOrderUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + getSoundId("order_cancelled"));
 
             ringingNewOrders = new HashSet<>();
-            this.context = context;
             vibrator = (Vibrator) context.getSystemService(VIBRATOR_SERVICE);
         } catch (Exception e) {
             // Timber.e(e);
@@ -181,7 +188,7 @@ public class AlarmHelper implements BaseAlarmHelper {
 
     private MediaPlayer getPlayer() {
         if (player == null) {
-            player = MediaPlayer.create(context, R.raw.new_order);
+            player = MediaPlayer.create(context, getSoundId("new_order"));
             player.setLooping(true);
         }
         return player;

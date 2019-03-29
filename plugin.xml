@@ -27,7 +27,11 @@
         <source-file src="src/GenericEmitter.java" target-dir="src/com/wsforeground/plugin" />
         <source-file src="src/BaseAlarmHelper.java" target-dir="src/com/wsforeground/plugin" />
         <source-file src="src/AlarmHelper.java" target-dir="src/com/wsforeground/plugin" />
+        <source-file src="src/Singleton.java" target-dir="src/com/wsforeground/plugin" />
+        <source-file src="src/ClickReceiver.java" target-dir="src/com/wsforeground/plugin" />
         <resource-file src="raw/new_order.mp3" target="res/raw/new_order.mp3" />
+        <resource-file src="raw/order_cancelled.mp3" target="res/raw/order_cancelled.mp3" />
+        <resource-file src="raw/order_changed.mp3" target="res/raw/order_changed.mp3" />
         <resource-file src="raw/monochrome.xml" target="res/drawable/monochrome.xml"/>
         <uses-permission android:name="android.permission.VIBRATE" />
         <service

@@ -16,13 +16,14 @@ import android.os.Build;
 
 public class SocketService extends CordovaPlugin {
     @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+        public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
         if (action.equals("start")) {
             JSONObject settings = args.optJSONObject(0);
             String token = settings.getString("token");
             String wsUrl = settings.getString("url");
             Boolean isFastFood = settings.getBoolean("isFastFood");
+
             this.start(token, wsUrl, isFastFood, callbackContext);
             return true;
         }
@@ -40,6 +41,7 @@ public class SocketService extends CordovaPlugin {
       serviceIntent.putExtra("token", token);
       serviceIntent.putExtra("wsUrl", wsUrl);
       serviceIntent.putExtra("isFastFood", isFastFood);
+        Singleton.getInstance().setCallbackContext(callbackContext);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
           cordova.getActivity().startForegroundService(serviceIntent);
       } else {
@@ -48,7 +50,9 @@ public class SocketService extends CordovaPlugin {
     }
 
     private void stop(CallbackContext callbackContext) {
-      Intent serviceIntent = new Intent(cordova.getActivity(), IncomingOrdersService.class);
+        Singleton.getInstance().setCallbackContext(null);
+
+        Intent serviceIntent = new Intent(cordova.getActivity(), IncomingOrdersService.class);
       cordova.getActivity().stopService(serviceIntent);
     }
 
