@@ -39,5 +39,10 @@
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="false" />
+        <service
+            android:name="com.wsforeground.plugin.ClickReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="false" />
     </platform>
 </plugin>

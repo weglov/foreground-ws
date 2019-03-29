@@ -2,6 +2,7 @@ package com.wsforeground.plugin;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -29,6 +30,7 @@ public class IncomingOrdersService extends Service {
     int FOREGROUND_NOTIFICATION_REQUEST_CODE = 93871;
     int FOREGROUND_NOTIFICATION_ID = 93872;
     String FOREGROUND_NOTIFICATION_CHANNEL = "Yandex.Vendor.Notification.Channel.Foreground";
+    String NOTIFICATION_CHANNEL = "Yandex.Vendor.Notification.Channel";
 
     SocketIO socket;
 
@@ -128,18 +130,23 @@ public class IncomingOrdersService extends Service {
                     } else {
                         alarmHelper.newOrderNotification(socketEvent.id);
                     }
-                    createNotification(socketEvent.id, "Новый заказ!", "new");
+                    createNotification(socketEvent.id, "", "Новый заказ!");
                     break;
                 case CHANGED:
                     alarmHelper.stopNotification(socketEvent.id);
                     alarmHelper.editOrderNotification();
-                    createNotification(socketEvent.id, "Заказ изменен", "изменен");
+                    createNotification(socketEvent.id, "", "Заказ изменен");
                 case STATUS_CHANGED:
+                    alarmHelper.stopNotification(socketEvent.id);
                     switch (socketEvent.status) {
-                        case "refused":
+                        case "accepted":
+                        case "released":
+                        case "delivered":
                             alarmHelper.stopNotification(socketEvent.id);
+                            break;
+                        case "refused":
                             alarmHelper.cancelOrderNotification();
-                            createNotification(socketEvent.id, "Заказ отменен", "отмена");
+                            createNotification(socketEvent.id, "", "Заказ отменен");
                             break;
                     }
                     break;
@@ -182,6 +189,7 @@ public class IncomingOrdersService extends Service {
         builder.setContentTitle(title)
                 .setContentText(text)
                 .setContentIntent(pendingIntent)
+                .setOngoing(true)
                 .setAutoCancel(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -193,6 +201,7 @@ public class IncomingOrdersService extends Service {
     }
 
     private void createNotification(String orderId, String text, String title) {
+
         NotificationManager manager = (NotificationManager)getBaseContext().getSystemService(NOTIFICATION_SERVICE);
         Intent contentIntent = new Intent(this, ClickReceiver.class);
         contentIntent.putExtra("orderId", orderId);
@@ -202,11 +211,15 @@ public class IncomingOrdersService extends Service {
                 contentIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-
-
         Notification.Builder builder;
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder = new Notification.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL);
+            CharSequence name = "ws-background";
+
+            NotificationChannel mChannel = new NotificationChannel(NOTIFICATION_CHANNEL, name,  NotificationManager.IMPORTANCE_DEFAULT);
+            manager.createNotificationChannel(mChannel);
+
+            builder = new Notification.Builder(this, NOTIFICATION_CHANNEL);
         } else {
             builder = new Notification.Builder(this);
         }
@@ -214,6 +227,7 @@ public class IncomingOrdersService extends Service {
                 .setContentText(text)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setSmallIcon(getIconResId());
