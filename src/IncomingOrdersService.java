@@ -30,6 +30,7 @@ public class IncomingOrdersService extends Service {
     int FOREGROUND_NOTIFICATION_REQUEST_CODE = 93871;
     int FOREGROUND_NOTIFICATION_ID = 93872;
     String FOREGROUND_NOTIFICATION_CHANNEL = "Yandex.Vendor.Notification.Channel.Foreground";
+    boolean WS_INIT = false;
     String NOTIFICATION_CHANNEL = "Yandex.Vendor.Notification.Channel";
 
     SocketIO socket;
@@ -53,20 +54,14 @@ public class IncomingOrdersService extends Service {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
 
-//        if (wifiManager != null && pm != null) {
-//            wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "YandexVendorWiFiLock");
-//            powerLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YandexVendorPowerLock");
-//        }
-
-    }
-
-    private void toggleLock(boolean isAppForeground) {
-        if (isAppForeground) {
-            releaseLock();
-        } else {
-            acquireLock();
+        if (wifiManager != null && pm != null) {
+            wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "YandexVendorWiFiLock");
+            powerLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YandexVendorPowerLock");
         }
+        acquireLock();
+
     }
+
 
     private void acquireLock() {
         if (wifiLock != null && !wifiLock.isHeld()) {
@@ -91,7 +86,10 @@ public class IncomingOrdersService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        releaseLock();
         socket.done();
+        WS_INIT = false;
+        alarmHelper.stopNotifications();
         if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
             compositeDisposable.dispose();
         }
@@ -100,6 +98,11 @@ public class IncomingOrdersService extends Service {
     @SuppressLint("CheckResult")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (!WS_INIT) {
+            return Service.START_NOT_STICKY;
+        }
+        WS_INIT = true;
+        Log.d("WS", "" + startId);
         String token = intent.getStringExtra("token");
         String wsUrl = intent.getStringExtra("wsUrl");
         boolean isFastFood = intent.getBooleanExtra("isFastFood",false);
@@ -173,6 +176,7 @@ public class IncomingOrdersService extends Service {
 
     private void createForegroundNotification(String text, String title) {
         Intent contentIntent = new Intent(this, MainActivity.class);
+        NotificationManager manager = (NotificationManager)getBaseContext().getSystemService(NOTIFICATION_SERVICE);
         contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this,
@@ -182,6 +186,10 @@ public class IncomingOrdersService extends Service {
 
         Notification.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Yandex.eda ожидание заказа";
+
+            NotificationChannel mChannel = new NotificationChannel(FOREGROUND_NOTIFICATION_CHANNEL, name,  NotificationManager.IMPORTANCE_DEFAULT);
+            manager.createNotificationChannel(mChannel);
             builder = new Notification.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL);
         } else {
             builder = new Notification.Builder(this);
@@ -214,7 +222,7 @@ public class IncomingOrdersService extends Service {
         Notification.Builder builder;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "ws-background";
+            CharSequence name = "Yandex.eda новые заказы";
 
             NotificationChannel mChannel = new NotificationChannel(NOTIFICATION_CHANNEL, name,  NotificationManager.IMPORTANCE_DEFAULT);
             manager.createNotificationChannel(mChannel);
