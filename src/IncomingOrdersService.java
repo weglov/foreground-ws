@@ -22,8 +22,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import okhttp3.OkHttpClient;
-import ru.yandex.vendor.dev.BuildConfig;
-import ru.yandex.vendor.dev.MainActivity;
 
 
 public class IncomingOrdersService extends Service {
@@ -113,8 +111,8 @@ public class IncomingOrdersService extends Service {
         String ver = "Android version: " + Build.VERSION.SDK_INT + " (" + Build.VERSION.RELEASE + ")";
         String query = "";
         try {
-            query = "&" + "version=" + URLEncoder.encode(BuildConfig.VERSION_NAME, "UTF-8") +
-                    "&" + "versionCode=" + URLEncoder.encode(String.valueOf(BuildConfig.VERSION_CODE), "UTF-8") +
+            query = "&" + "version=" + URLEncoder.encode("TODO", "UTF-8") +
+                    "&" + "versionCode=" + URLEncoder.encode("TODO", "UTF-8") +
                     "&" + "deviceType=" + URLEncoder.encode("android", "UTF-8") +
                     "&" + "deviceModel=" + URLEncoder.encode(Build.MODEL, "UTF-8") +
                     "&" + "deviceBrand=" + URLEncoder.encode(Build.MANUFACTURER, "UTF-8") +
@@ -175,7 +173,9 @@ public class IncomingOrdersService extends Service {
     }
 
     private void createForegroundNotification(String text, String title) {
-        Intent contentIntent = new Intent(this, MainActivity.class);
+        String packageName = getBaseContext().getPackageName();
+        Intent contentIntent = getBaseContext().getPackageManager().getLaunchIntentForPackage(packageName);
+//        Intent contentIntent = new Intent(this, MainActivity.class);
         NotificationManager manager = (NotificationManager)getBaseContext().getSystemService(NOTIFICATION_SERVICE);
         contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
