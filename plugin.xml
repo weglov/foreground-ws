@@ -33,16 +33,20 @@
         <resource-file src="raw/order_cancelled.mp3" target="res/raw/order_cancelled.mp3" />
         <resource-file src="raw/order_changed.mp3" target="res/raw/order_changed.mp3" />
         <resource-file src="raw/monochrome.xml" target="res/drawable/monochrome.xml"/>
-        <uses-permission android:name="android.permission.VIBRATE" />
-        <service
-            android:name="com.wsforeground.plugin.IncomingOrdersService"
-            android:enabled="true"
-            android:exported="false"
-            android:stopWithTask="false" />
-        <service
-            android:name="com.wsforeground.plugin.ClickReceiver"
-            android:enabled="true"
-            android:exported="false"
-            android:stopWithTask="false" />
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.VIBRATE" />
+        </config-file>
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <service
+                android:name="com.wsforeground.plugin.IncomingOrdersService"
+                android:enabled="true"
+                android:exported="false"
+                android:stopWithTask="false" />
+            <service
+                android:name="com.wsforeground.plugin.ClickReceiver"
+                android:enabled="true"
+                android:exported="false"
+                android:stopWithTask="false" />
+        </config-file>
     </platform>
 </plugin>
