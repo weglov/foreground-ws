@@ -43,7 +43,6 @@ public class IncomingOrdersService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("message", "onCreate");
         createForegroundNotification("Приложение работает в фоновом режиме", "Связь с сервисом установлена");
         alarmHelper = new AlarmHelper(getBaseContext());
 
@@ -96,11 +95,9 @@ public class IncomingOrdersService extends Service {
     @SuppressLint("CheckResult")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (!WS_INIT) {
+        if (WS_INIT) {
             return Service.START_NOT_STICKY;
         }
-        WS_INIT = true;
-        Log.d("WS", "" + startId);
         String token = intent.getStringExtra("token");
         String wsUrl = intent.getStringExtra("wsUrl");
         boolean isFastFood = intent.getBooleanExtra("isFastFood",false);
@@ -155,7 +152,7 @@ public class IncomingOrdersService extends Service {
             }
         });
 
-
+        WS_INIT = true;
         return super.onStartCommand(intent, flags, startId);
     }
 
