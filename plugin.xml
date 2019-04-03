@@ -35,6 +35,7 @@
         <resource-file src="raw/monochrome.xml" target="res/drawable/monochrome.xml"/>
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.VIBRATE" />
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service
