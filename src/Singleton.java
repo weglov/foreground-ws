@@ -7,6 +7,7 @@ public class Singleton {
     private static Singleton singleton;
 
     private CallbackContext callbackContext;
+    private BaseAlarmHelper alarmHelper;
 
     private Singleton() {}
 
@@ -24,5 +25,13 @@ public class Singleton {
 
     public void setCallbackContext(CallbackContext callbackContext) {
         this.callbackContext = callbackContext;
+    }
+
+    public BaseAlarmHelper getAlarmHelper() {
+        return alarmHelper;
+    }
+
+    public void setAlarmHelper(BaseAlarmHelper alarmHelper) {
+        this.alarmHelper = alarmHelper;
     }
 }

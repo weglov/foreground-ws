@@ -6,8 +6,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
@@ -23,10 +25,13 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import okhttp3.OkHttpClient;
 
+import static android.content.Intent.ACTION_SCREEN_OFF;
+
 
 public class IncomingOrdersService extends Service {
     int FOREGROUND_NOTIFICATION_REQUEST_CODE = 93871;
     int FOREGROUND_NOTIFICATION_ID = 93872;
+    private BroadcastReceiver screenOffReceiver;
     String FOREGROUND_NOTIFICATION_CHANNEL = "Yandex.Vendor.Notification.Channel.Foreground";
     boolean WS_INIT = false;
     String NOTIFICATION_CHANNEL = "Yandex.Vendor.Notification.Channel";
@@ -44,7 +49,7 @@ public class IncomingOrdersService extends Service {
     public void onCreate() {
         super.onCreate();
         createForegroundNotification("Приложение работает в фоновом режиме", "Связь с сервисом установлена");
-        alarmHelper = new AlarmHelper(getBaseContext());
+        alarmHelper = Singleton.getInstance().getAlarmHelper();
 
         compositeDisposable = new CompositeDisposable();
 
@@ -56,7 +61,14 @@ public class IncomingOrdersService extends Service {
             powerLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YandexVendorPowerLock");
         }
         acquireLock();
-
+        IntentFilter screenOffFilter = new IntentFilter(ACTION_SCREEN_OFF);
+        screenOffReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                alarmHelper.restartVibrateIfNeed();
+            }
+        };
+        registerReceiver(screenOffReceiver, screenOffFilter);
     }
 
 
@@ -90,13 +102,14 @@ public class IncomingOrdersService extends Service {
         if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
             compositeDisposable.dispose();
         }
+        unregisterReceiver(screenOffReceiver);
     }
 
     @SuppressLint("CheckResult")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (WS_INIT) {
-            return Service.START_NOT_STICKY;
+            return Service.START_REDELIVER_INTENT;
         }
         String token = intent.getStringExtra("token");
         String wsUrl = intent.getStringExtra("wsUrl");
@@ -128,12 +141,12 @@ public class IncomingOrdersService extends Service {
                     } else {
                         alarmHelper.newOrderNotification(socketEvent.id);
                     }
-                    createNotification(socketEvent.id, "", "Новый заказ!");
+                    createNotification(socketEvent.id, "Яндекс.Еда для ресторанов", "Новый заказ!");
                     break;
                 case CHANGED:
                     alarmHelper.stopNotification(socketEvent.id);
                     alarmHelper.editOrderNotification();
-                    createNotification(socketEvent.id, "", "Заказ изменен");
+                    createNotification(socketEvent.id, "Яндекс.Еда для ресторанов", "Заказ изменен");
                 case STATUS_CHANGED:
                     alarmHelper.stopNotification(socketEvent.id);
                     switch (socketEvent.status) {
@@ -144,7 +157,7 @@ public class IncomingOrdersService extends Service {
                             break;
                         case "refused":
                             alarmHelper.cancelOrderNotification();
-                            createNotification(socketEvent.id, "", "Заказ отменен");
+                            createNotification(socketEvent.id, "Яндекс.Еда для ресторанов", "Заказ отменен");
                             break;
                     }
                     break;
@@ -153,7 +166,7 @@ public class IncomingOrdersService extends Service {
         });
 
         WS_INIT = true;
-        return super.onStartCommand(intent, flags, startId);
+        return START_REDELIVER_INTENT;
     }
 
     private int getIconResId ()

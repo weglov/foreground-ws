@@ -39,7 +39,7 @@ public class AlarmHelper implements BaseAlarmHelper {
     private boolean isVibrating = false;
     private long[] lastVibrationPattern = null;
 
-    private long[] vibrationPatternNew = {250, 500, 250, 500};
+    private long[] vibrationPatternNew = {0, 155, 700, 2195};
     private long[] vibrationPatternEdit = {250, 750, 500, 250, 750, 250};
     private long[] vibrationPatternCancel = {250, 250, 250, 250, 750, 750, 250, 250};
     private int getSoundId (String name)

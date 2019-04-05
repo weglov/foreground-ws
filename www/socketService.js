@@ -10,6 +10,9 @@ var SocketService = {
 	stop: function(args, callback) {
 		exec(callback, null, this.serviceName, "stop", [args]);
 	},
+	trigger: function(args, callback) {
+		exec(callback, null, this.serviceName, "trigger", [args]);
+	},
 };
 
 module.exports = SocketService;
